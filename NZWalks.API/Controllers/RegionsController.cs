@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
+using NZWalks.API.Repositories;
 
 namespace NZWalks.API.Controllers;
 
@@ -15,14 +11,16 @@ namespace NZWalks.API.Controllers;
 public class RegionsController : ControllerBase
 {
     private readonly NZWalksDbContext _dbContext;
+    private readonly IRegionRepository _regionRepository;
 
-    public RegionsController(NZWalksDbContext dbContext)
+    public RegionsController(NZWalksDbContext dbContext, IRegionRepository regionRepository)
     {
         _dbContext = dbContext;
+        _regionRepository = regionRepository;
     }
 
     [HttpPost]
-    public IActionResult Create([FromBody] AddRegionRequestDto addRegionRequestDto)
+    public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
     {
         var regionDomainModel = new Region
         {
@@ -31,8 +29,8 @@ public class RegionsController : ControllerBase
             RegionImageUrl = addRegionRequestDto.RegionImageUrl
         };
 
-        _dbContext.Add(regionDomainModel);
-        _dbContext.SaveChanges();
+        await _dbContext.AddAsync(regionDomainModel);
+        await _dbContext.SaveChangesAsync();
 
         var regionDto = new RegionDto
         {
@@ -44,19 +42,20 @@ public class RegionsController : ControllerBase
 
         return CreatedAtAction(nameof(GetById), new { id = regionDomainModel.Id }, regionDto);
     }
-    
+
     [HttpPut]
     [Route("{id:Guid}")]
-    public IActionResult Update([FromRoute] Guid id, [FromBody] UpdateRegsionRequestDto updateRegionRequestDto)
+    public async Task<IActionResult> Update([FromRoute] Guid id,
+        [FromBody] UpdateRegsionRequestDto updateRegionRequestDto)
     {
-        var regionDomainModel = _dbContext.Regions.Find(id);
+        var regionDomainModel = await _dbContext.Regions.FindAsync(id);
         if (regionDomainModel == null) return NotFound();
 
         regionDomainModel.Name = updateRegionRequestDto.Name;
         regionDomainModel.Code = updateRegionRequestDto.Code;
         regionDomainModel.RegionImageUrl = updateRegionRequestDto.RegionImageUrl;
-        
-        _dbContext.SaveChanges();
+
+        await _dbContext.SaveChangesAsync();
 
         var regionDto = new RegionDto
         {
@@ -70,9 +69,9 @@ public class RegionsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        var regionDomainModel = _dbContext.Regions.ToList();
+        var regionDomainModel = await _regionRepository.GetAllAsync();
         var regionDto = new List<RegionDto>();
 
         foreach (var regionDomain in regionDomainModel)
@@ -88,9 +87,9 @@ public class RegionsController : ControllerBase
 
     [HttpGet]
     [Route("{id:Guid}")]
-    public IActionResult GetById([FromRoute] Guid id)
+    public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
-        var regionDomainModel = _dbContext.Regions.Find(id);
+        var regionDomainModel = await _dbContext.Regions.FindAsync(id);
         if (regionDomainModel == null) return NotFound();
 
         var regionDto = new RegionDto()
@@ -105,14 +104,14 @@ public class RegionsController : ControllerBase
 
     [HttpDelete]
     [Route("{id:Guid}")]
-    public IActionResult DeleteById([FromRoute] Guid id)
+    public async Task<IActionResult> DeleteById([FromRoute] Guid id)
     {
-        var regionDomainModel = _dbContext.Regions.Find(id);
+        var regionDomainModel = await _dbContext.Regions.FindAsync(id);
         if (regionDomainModel == null) return NotFound();
 
         _dbContext.Regions.Remove(regionDomainModel);
-        _dbContext.SaveChanges();
-        
+        await _dbContext.SaveChangesAsync();
+
         var regionDto = new RegionDto()
         {
             Id = regionDomainModel.Id,
@@ -120,7 +119,7 @@ public class RegionsController : ControllerBase
             Code = regionDomainModel.Code,
             RegionImageUrl = regionDomainModel.RegionImageUrl
         };
-        
+
         return Ok(regionDto);
     }
 }
