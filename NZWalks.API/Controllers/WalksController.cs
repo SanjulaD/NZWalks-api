@@ -1,38 +1,76 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
 using NZWalks.API.Repositories;
 
-namespace NZWalks.API.Controllers
+namespace NZWalks.API.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class WalksController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class WalksController : ControllerBase
+    private readonly IMapper _mapper;
+    public readonly IWalkRepository _walkRepository;
+
+    public WalksController(IMapper mapper, IWalkRepository walkRepository)
     {
-        public readonly IWalkRepository _walkRepository;
-        private readonly IMapper _mapper;
+        _walkRepository = walkRepository;
+        _mapper = mapper;
+    }
 
-        public WalksController(IMapper mapper, IWalkRepository walkRepository)
-        {
-            _walkRepository = walkRepository;
-            _mapper = mapper;
-        }
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] AddWalkRequestDto addWalkRequestDto)
-        {
-            var walkDomainModel = _mapper.Map<Walk>(addWalkRequestDto);
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] AddWalkRequestDto addWalkRequestDto)
+    {
+        var walkDomainModel = _mapper.Map<Walk>(addWalkRequestDto);
 
-            await _walkRepository.CreateAsync(walkDomainModel);
-  
-            var regionDto = _mapper.Map<WalkDto>(walkDomainModel);
+        await _walkRepository.CreateAsync(walkDomainModel);
 
-            return CreatedAtAction(nameof(GetById), new { id = walkDomainModel.Id }, regionDto);
-        }
+        var regionDto = _mapper.Map<WalkDto>(walkDomainModel);
+
+        return Ok(regionDto);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var walksDomainModel = await _walkRepository.GetAllAsync();
+
+        var walkDto = _mapper.Map<List<WalkDto>>(walksDomainModel);
+        return Ok(walkDto);
+    }
+
+    [HttpGet]
+    [Route("{id:Guid}")]
+    public async Task<IActionResult> GetById([FromRoute] Guid id)
+    {
+        var walksDomainModel = await _walkRepository.GetByIdAsync(id);
+        if (walksDomainModel == null) return NotFound();
+
+        var walksDto = _mapper.Map<WalkDto>(walksDomainModel);
+        return Ok(walksDto);
+    }
+
+    [HttpPut]
+    [Route("{id:Guid}")]
+    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateWalksRequestDto updateWalksRequestDto)
+    {
+        var walksDomainModel = _mapper.Map<Walk>(updateWalksRequestDto);
+        walksDomainModel = await _walkRepository.UpdateAsync(id, walksDomainModel);
+
+        if (walksDomainModel == null) return NotFound();
+
+        var walkDto = _mapper.Map<WalkDto>(walksDomainModel);
+
+        return Ok(walkDto);
+    }
+
+    [HttpDelete]
+    [Route("{id:Guid}")]
+    public async Task<IActionResult> DeleteById([FromRoute] Guid id)
+    {
+        var walksDomainModel = await _walkRepository.DeleteAsync(id);
+        var walksDto = _mapper.Map<WalkDto>(walksDomainModel);
+        return Ok(walksDto);
     }
 }

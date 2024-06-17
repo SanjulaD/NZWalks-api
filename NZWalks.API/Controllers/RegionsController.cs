@@ -12,8 +12,8 @@ namespace NZWalks.API.Controllers;
 public class RegionsController : ControllerBase
 {
     private readonly NZWalksDbContext _dbContext;
-    private readonly IRegionRepository _regionRepository;
     private readonly IMapper _mapper;
+    private readonly IRegionRepository _regionRepository;
 
     public RegionsController(NZWalksDbContext dbContext, IRegionRepository regionRepository, IMapper mapper)
     {
@@ -37,7 +37,7 @@ public class RegionsController : ControllerBase
     [HttpPut]
     [Route("{id:Guid}")]
     public async Task<IActionResult> Update([FromRoute] Guid id,
-        [FromBody] UpdateRegsionRequestDto updateRegionRequestDto)
+        [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
     {
         var regionDomainModel = _mapper.Map<Region>(updateRegionRequestDto);
         regionDomainModel = await _regionRepository.UpdateAsync(id, regionDomainModel);

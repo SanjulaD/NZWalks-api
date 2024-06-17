@@ -19,7 +19,7 @@ namespace NZWalks.API.Migrations
                 .HasAnnotation("ProductVersion", "7.0.20")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("NZWalks.API.Models.Domain.Difficulty", b =>
+            modelBuilder.Entity("NZWalks.API.Models.Domain.DifficultyDto", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -151,7 +151,7 @@ namespace NZWalks.API.Migrations
 
             modelBuilder.Entity("NZWalks.API.Models.Domain.WalkDto", b =>
                 {
-                    b.HasOne("NZWalks.API.Models.Domain.Difficulty", "Difficulty")
+                    b.HasOne("NZWalks.API.Models.Domain.DifficultyDto", "DifficultyDto")
                         .WithMany()
                         .HasForeignKey("DifficultyId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -163,7 +163,7 @@ namespace NZWalks.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Difficulty");
+                    b.Navigation("DifficultyDto");
 
                     b.Navigation("Region");
                 });
