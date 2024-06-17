@@ -11,8 +11,8 @@ using NZWalks.API.Data;
 namespace NZWalks.API.Migrations
 {
     [DbContext(typeof(NZWalksDbContext))]
-    [Migration("20240615183841_Seed Data for Difficulties and Regions")]
-    partial class SeedDataforDifficultiesandRegions
+    [Migration("20240617180607_seed data for difficulties and regions")]
+    partial class seeddatafordifficultiesandregions
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

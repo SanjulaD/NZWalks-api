@@ -15,10 +15,13 @@ public class NZWalksDbContext : DbContext
 
     public DbSet<Walk> Walks { get; set; }
 
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
+        // Seed data for Difficulties
+        // Easy, Medium, Hard
         var difficulties = new List<Difficulty>()
         {
             new()
@@ -38,8 +41,11 @@ public class NZWalksDbContext : DbContext
             }
         };
 
+        // Seed difficulties to the database
         modelBuilder.Entity<Difficulty>().HasData(difficulties);
 
+
+        // Seed data for Regions
         var regions = new List<Region>
         {
             new()
