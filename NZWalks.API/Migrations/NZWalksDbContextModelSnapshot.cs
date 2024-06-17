@@ -114,7 +114,7 @@ namespace NZWalks.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("NZWalks.API.Models.Domain.Walk", b =>
+            modelBuilder.Entity("NZWalks.API.Models.Domain.WalkDto", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -149,7 +149,7 @@ namespace NZWalks.API.Migrations
                     b.ToTable("Walks");
                 });
 
-            modelBuilder.Entity("NZWalks.API.Models.Domain.Walk", b =>
+            modelBuilder.Entity("NZWalks.API.Models.Domain.WalkDto", b =>
                 {
                     b.HasOne("NZWalks.API.Models.Domain.Difficulty", "Difficulty")
                         .WithMany()
