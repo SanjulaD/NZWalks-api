@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using NZWalks.API.Models.Domain;
 
 namespace NZWalks.API.Repositories;
