@@ -11,7 +11,6 @@ namespace NZWalks.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
 public class RegionsController : ControllerBase
 {
     private readonly NZWalksDbContext _dbContext;
@@ -27,6 +26,7 @@ public class RegionsController : ControllerBase
 
     [HttpPost]
     [ValidateModel]
+    [Authorize(Roles = "Writer")]
     public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
     {
         var regionDomainModel = _mapper.Map<Region>(addRegionRequestDto);
@@ -41,6 +41,7 @@ public class RegionsController : ControllerBase
     [HttpPut]
     [Route("{id:Guid}")]
     [ValidateModel]
+    [Authorize(Roles = "Writer")]
     public async Task<IActionResult> Update([FromRoute] Guid id,
         [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
     {
@@ -53,6 +54,7 @@ public class RegionsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Reader")]
     public async Task<IActionResult> GetAll()
     {
         var regionDomainModel = await _regionRepository.GetAllAsync();
@@ -62,6 +64,7 @@ public class RegionsController : ControllerBase
 
     [HttpGet]
     [Route("{id:Guid}")]
+    [Authorize(Roles = "Reader")]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
         var regionDomainModel = await _regionRepository.GetByIdAsync(id);
@@ -73,6 +76,8 @@ public class RegionsController : ControllerBase
 
     [HttpDelete]
     [Route("{id:Guid}")]
+    [Authorize]
+    [Authorize(Roles = "Writer")]
     public async Task<IActionResult> DeleteById([FromRoute] Guid id)
     {
         var regionDomainModel = await _regionRepository.DeleteAsync(id);

@@ -49,20 +49,17 @@ public class AuthController : ControllerBase
         {
             var checkPasswordResult = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
 
-            if (checkPasswordResult)
+            if (!checkPasswordResult) return BadRequest("Username or password incorrect");
+            var roles = await _userManager.GetRolesAsync(user);
             {
-                var roles = await _userManager.GetRolesAsync(user);
-                if (roles != null)
+                var jwtToken = _tokenRepository.CreateJwtToken(user, roles.ToList());
+
+                var response = new LoginResponseDto
                 {
-                    var jwtToken = _tokenRepository.CreateJwtToken(user, roles.ToList());
+                    JwtToken = jwtToken
+                };
 
-                    var response = new LoginResponseDto
-                    {
-                        JwtToken = jwtToken
-                    };
-
-                    return Ok(response);
-                }
+                return Ok(response);
             }
         }
 
